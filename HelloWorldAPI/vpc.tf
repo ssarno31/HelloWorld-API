@@ -21,6 +21,7 @@ resource "aws_subnet" "public_subnet_1" {
 
   tags = "${
     map(
+     "Name", "public_subnet_1", 
      "kubernetes.io/cluster/HelloWorld_API", "shared",
     )
   }"
@@ -31,6 +32,7 @@ resource "aws_subnet" "public_subnet_2" {
 
   tags = "${
     map(
+     "Name", "public_subnet_2", 
      "kubernetes.io/cluster/HelloWorld_API", "shared",
     )
   }"
@@ -47,13 +49,6 @@ resource "aws_route_table" "public_route_table" {
   tags = {
     Name = "public_route_table"
   }
-}
-
-resource "aws_route" "default_route" {
-  route_table_id         = "${aws_route_table.public_route_table.id}"
-  destination_cidr_block = "0.0.0.0/0"
-  gateway_id             = "${aws_internet_gateway.igw.id}"
-  depends_on             = ["aws_route_table.public_route_table"]
 }
 
 resource "aws_route_table_association" "public_route_1" {
@@ -78,29 +73,12 @@ resource "aws_network_acl" "public_nacl" {
     cidr_block = "10.0.0.0/16"
   }
 
-  egress {
-    protocol   = "tcp"
-    rule_no    = 200
-    action     = "allow"
-    from_port  = 443
-    to_port    = 443
-    cidr_block = "10.0.0.0/16"
-  }
-
   ingress {
     protocol   = "tcp"
     rule_no    = 100
     action     = "allow"
     from_port  = 8080
     to_port    = 8080
-    cidr_block = "10.0.0.0/16"
-  }
-  ingress {
-    protocol   = "tcp"
-    rule_no    = 200
-    action     = "allow"
-    from_port  = 443
-    to_port    = 443
     cidr_block = "10.0.0.0/16"
   }
 
