@@ -61,28 +61,30 @@ resource "aws_route_table_association" "public_route_2" {
   route_table_id = "${aws_route_table.public_route_table.id}"
 }
 
-resource "aws_network_acl" "public_nacl" {
-  vpc_id = "${aws_vpc.main_vpc.id}"
+resource "aws_network_acl" "main_nacl" {
+    vpc_id     = "${aws_vpc.main_vpc.id}"
+    subnet_ids = ["${aws_subnet.public_subnet_1.id}",
+     "${aws_subnet.public_subnet_2.id}"]
 
-  egress {
-    protocol   = "tcp"
-    rule_no    = 100
-    action     = "allow"
-    from_port  = 8080
-    to_port    = 8080
-    cidr_block = "10.0.0.0/16"
-  }
+    ingress {
+        from_port  = 0
+        to_port    = 0
+        rule_no    = 100
+        action     = "allow"
+        protocol   = "-1"
+        cidr_block = "0.0.0.0/0"
+    }
 
-  ingress {
-    protocol   = "tcp"
-    rule_no    = 100
-    action     = "allow"
-    from_port  = 8080
-    to_port    = 8080
-    cidr_block = "10.0.0.0/16"
-  }
+    egress {
+        from_port  = 0
+        to_port    = 0
+        rule_no    = 100
+        action     = "allow"
+        protocol   = "-1"
+        cidr_block = "0.0.0.0/0"
+    }
 
-  tags = {
-    Name = "main_nacl"
-  }
+    tags {
+        "Name" = "main_nacl"
+    }
 }
